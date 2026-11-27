@@ -3,6 +3,7 @@
 Katalog streaming sinematik berbasis **Telegram Mini App** untuk koleksi **Film (286 judul)**, **Series (18 judul / 214 episode)**, dan **Donghua & Anime (74 judul / 1.589 episode)** lengkap poster `.webp` lokal yang kebal blokir ISP.
 
 - **Live WebApp URL:** https://blue242.github.io/xperia-film/
+- **Bot Telegram Resmi:** [@xperiafilm_bot](https://t.me/xperiafilm_bot) *(aktif dengan foto profil sinema kustom, tombol menu `🎬 Buka Katalog`, bio, deskripsi sambutan, `/start`, serta OpenGraph share preview)*
 - **Repository GitHub:** https://github.com/blue242/xperia-film
 
 ## Fitur Utama UI/UX
@@ -13,9 +14,10 @@ Katalog streaming sinematik berbasis **Telegram Mini App** untuk koleksi **Film 
 - **Fitur Personal:** Bar emas `▶ Lanjutkan Menonton`, `❤️ Simpanan Gua (Watchlist)`, `🎲 Cinema Roulette`, dan Live Search instan.
 
 ## Struktur Folder
+- `index.html` — Entrypoint WebApp dilengkapi OpenGraph preview (`og:image` -> `bot-avatar.jpg`) & `apple-touch-icon`.
 - `src/` — Kode frontend modular React 18 + TypeScript + Tailwind CSS (`types/`, `utils/`, `hooks/`, `components/{layout,cards,home,explore,detail,modals}/`).
-- `public/data/` & `public/posters/` — Dataset JSON statis & 390 gambar `.webp` lokal.
-- `scripts/` — `setup_telegram_bot.py` (pemasang tombol Menu Bot Telegram) & `sync_and_deploy.ps1` (satu-klik sinkronisasi Realme -> GitHub Pages).
+- `public/` — `bot-avatar.jpg` (PP sinema `640x640` & thumbnail share), `data/`, & `posters/` (390 gambar `.webp` lokal).
+- `scripts/` — `setup_telegram_bot.py` (konfigurator penuh `@xperiafilm_bot` tanpa menyimpan token) & `sync_and_deploy.ps1` (satu-klik sinkronisasi Realme -> GitHub Pages).
 - `.github/workflows/deploy.yml` — Pipeline CI/CD otomatis ke GitHub Pages.
 
 ## Menjalankan Lokal

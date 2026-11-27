@@ -1,7 +1,8 @@
 # USAGE — Panduan Penggunaan, Update Katalog & Integrasi Bot
 
-## 1. URL Live Produksi
+## 1. URL Live Produksi & Bot Resmi
 - **GitHub Pages (Mini App URL):** `https://blue242.github.io/xperia-film/`
+- **Bot Telegram Resmi:** `@xperiafilm_bot` (`https://t.me/xperiafilm_bot`) — foto profil sinema, tombol menu **`🎬 Buka Katalog`**, bio, deskripsi sambutan, command `/start`, dan OpenGraph link preview sudah aktif.
 
 ## 2. Satu-Klik Update Katalog ke Depannya (PC Acer)
 Setiap kali ada film, episode series, atau episode donghua baru di channel Telegram, jalankan skrip otomatis berikut di PowerShell PC Acer:
@@ -27,12 +28,24 @@ git commit -m "chore(catalog): update catalog"
 git push origin main
 ```
 
-## 4. Memasang Mini App ke Bot Telegram (`@BotFather`)
-Jalankan skrip interaktif (tidak menyimpan token ke file mana pun):
+## 4. Konfigurasi Profil & Mini App Bot Telegram (`@xperiafilm_bot`)
+Skrip bersifat *stateless* (membaca `$env:TELEGRAM_BOT_TOKEN` di memori atau input interaktif, **tidak pernah** menyimpan token ke file mana pun):
 ```powershell
+$env:TELEGRAM_BOT_TOKEN = "<BOT_TOKEN_DARI_BOTFATHER>"
 python c:\Users\server\katalog_mini_app\scripts\setup_telegram_bot.py
 ```
-Masukkan `BOT_TOKEN` saat diminta, maka tombol menu **`🎬 Xperia Film`** otomatis aktif di ruang chat bot dan mengarah ke `https://blue242.github.io/xperia-film/`.
+Dalam satu eksekusi, skrip otomatis menjalankan:
+1. `getMe` — memverifikasi identitas bot & status `has_main_web_app`.
+2. `setMyProfilePhoto` — mengunggah `public/bot-avatar.jpg` (bisa diganti lewat `--avatar`).
+3. `setChatMenuButton` — memasang tombol menu **`🎬 Buka Katalog`** ke `https://blue242.github.io/xperia-film/`.
+4. `setMyShortDescription` & `setMyDescription` — memasang bio ringkas & sambutan ruang chat bot.
+5. `setMyCommands` — mendaftarkan command `/start`.
+
+Untuk cek status live bot tanpa mengubah pengaturan apa pun:
+```powershell
+python c:\Users\server\katalog_mini_app\scripts\setup_telegram_bot.py --verify-only
+```
+*(Opsional: Untuk mengaktifkan status `has_main_web_app=true` agar muncul tombol Launch di profil bot, daftarkan URL Mini App lewat `@BotFather` -> `/setmainapp` -> `@xperiafilm_bot`.)*
 
 ## 5. Pengembangan Lokal
 ```powershell

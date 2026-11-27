@@ -27,5 +27,9 @@ Lokasi: `c:\Users\server\katalog_mini_app\` (Stack: React 18, TypeScript, Vite 6
 - `src/components/explore/` — `AlphabetBar.tsx`, `CatalogGridView.tsx` (Grid 3 Kolom + Load More 36 item), `SuperExplorerView.tsx`.
 - `src/components/detail/` — `DetailModal.tsx`, `MovieWatchPanel.tsx`, `SeriesEpisodePanel.tsx`, `DonghuaEpisodePanel.tsx`.
 - `src/components/modals/` — `SearchOverlay.tsx`, `RouletteModal.tsx`, `InfoRequestModal.tsx`.
+- `index.html` — Entry HTML dengan Telegram WebApp SDK, font `Outfit` / `Plus Jakarta Sans`, `apple-touch-icon`, serta meta OpenGraph (`og:title`, `og:description`, `og:image` ke `bot-avatar.jpg`).
+- `public/bot-avatar.jpg` — Aset foto profil resmi `@xperiafilm_bot` (`640x640` RGB JPEG) sekaligus thumbnail share link OpenGraph.
+- `scripts/setup_telegram_bot.py` — Konfigurator profil & Mini App `@xperiafilm_bot` berbasis stdlib Python (`urllib`, `mimetypes`, `uuid`) untuk `setMyProfilePhoto`, `setChatMenuButton`, bio, deskripsi, `/start`, dan `--verify-only`.
+- `scripts/sync_and_deploy.ps1` — Skrip sinkronisasi 1-klik Termux Realme -> `public/` -> GitHub Pages.
 - `src/App.tsx` & `src/main.tsx` — Koordinator state navigasi & entrypoint aplikasi.
 - `.github/workflows/deploy.yml` — Workflow GitHub Actions pembangun `dist/` dan deployer otomatis ke `https://blue242.github.io/xperia-film/`.
