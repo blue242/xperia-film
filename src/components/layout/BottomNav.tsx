@@ -25,7 +25,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
   return (
     <nav
       aria-label="Navigasi Utama"
-      className="fixed left-1/2 z-40 w-[calc(100%-1.25rem)] max-w-lg -translate-x-1/2 bottom-safe-dock"
+      className="fixed left-1/2 z-40 w-[calc(100%-1.25rem)] max-w-lg -translate-x-1/2 bottom-safe-dock touch-manipulation"
     >
       <div className="luxury-glass flex items-center justify-between rounded-2xl px-1.5 py-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.82)]">
         {NAV_ITEMS.map(({ id, label, Icon }) => {

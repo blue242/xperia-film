@@ -110,7 +110,7 @@ export const SeriesEpisodePanel: React.FC<SeriesEpisodePanelProps> = ({
 
       {/* Season Tabs + Episode Number Jump Box */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-        <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto">
+        <div className="horizontal-rail-scroll no-scrollbar flex items-center gap-1.5 overflow-x-auto overflow-y-hidden py-0.5">
           {seasonKeys.map((sk) => {
             const active = sk === selectedSeason;
             const epCount = item.seasons?.[sk]?.length || 0;

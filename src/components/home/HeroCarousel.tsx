@@ -33,12 +33,28 @@ const HeroCarouselInner: React.FC<HeroCarouselProps> = ({
   onSelectCountry,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const touchStartX = useRef<number | null>(null);
+  const isPausedRef = useRef(false);
+  const resumeTimerRef = useRef<number | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const clearResumeTimer = () => {
+    if (resumeTimerRef.current !== null) {
+      window.clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
+    }
+  };
 
   useEffect(() => {
     setActiveIndex(0);
   }, [items]);
+
+  useEffect(() => {
+    return () => {
+      if (resumeTimerRef.current !== null) {
+        window.clearTimeout(resumeTimerRef.current);
+      }
+    };
+  }, []);
 
   const safeIndex = items.length > 0 ? activeIndex % items.length : 0;
   const current = items[safeIndex];
@@ -51,12 +67,13 @@ const HeroCarouselInner: React.FC<HeroCarouselProps> = ({
   }, [current]);
 
   useEffect(() => {
-    if (items.length <= 1 || isPaused) return;
+    if (items.length <= 1) return;
     const timer = window.setInterval(() => {
+      if (isPausedRef.current) return;
       setActiveIndex((prev) => (prev + 1) % items.length);
     }, 6500);
     return () => window.clearInterval(timer);
-  }, [items.length, isPaused]);
+  }, [items.length, safeIndex]);
 
   if (!current) return null;
 
@@ -94,32 +111,59 @@ const HeroCarouselInner: React.FC<HeroCarouselProps> = ({
     setActiveIndex((prev) => (prev + 1) % items.length);
   };
 
+  const scheduleResume = () => {
+    clearResumeTimer();
+    resumeTimerRef.current = window.setTimeout(() => {
+      isPausedRef.current = false;
+      resumeTimerRef.current = null;
+    }, 1500);
+  };
+
   const handleTouchStart = (e: React.TouchEvent) => {
-    setIsPaused(true);
-    touchStartX.current = e.touches[0].clientX;
+    clearResumeTimer();
+    isPausedRef.current = true;
+    const touch = e.touches[0];
+    if (touch) {
+      touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    }
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current !== null) {
-      const delta = e.changedTouches[0].clientX - touchStartX.current;
-      if (Math.abs(delta) > 42) {
-        if (delta < 0) goNext();
+    const start = touchStartRef.current;
+    const endTouch = e.changedTouches[0];
+    if (start && endTouch && items.length > 1) {
+      const dx = endTouch.clientX - start.x;
+      const dy = endTouch.clientY - start.y;
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.6) {
+        if (dx < 0) goNext();
         else goPrev();
       }
     }
-    touchStartX.current = null;
-    window.setTimeout(() => setIsPaused(false), 1500);
+    touchStartRef.current = null;
+    scheduleResume();
+  };
+
+  const handleTouchCancel = () => {
+    touchStartRef.current = null;
+    scheduleResume();
   };
 
   return (
     <section
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      onMouseEnter={() => {
+        clearResumeTimer();
+        isPausedRef.current = true;
+      }}
+      onMouseLeave={() => {
+        clearResumeTimer();
+        isPausedRef.current = false;
+      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative mx-auto w-full max-w-7xl px-3 pt-3 sm:px-5 sm:pt-4"
+      onTouchCancel={handleTouchCancel}
+      className="relative mx-auto w-full max-w-7xl px-3 pt-3 sm:px-5 sm:pt-4 touch-pan-y select-none"
     >
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 bg-[#0a0a14] shadow-[0_18px_42px_-12px_rgba(0,0,0,0.85)] min-h-[340px] sm:min-h-[410px] lg:min-h-[450px] flex items-end">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 bg-[#0a0a14] shadow-[0_18px_42px_-12px_rgba(0,0,0,0.85)] min-h-[340px] sm:min-h-[410px] lg:min-h-[450px] flex items-end touch-pan-y">
         {/* Widescreen Backdrop Layer (No heavy CSS blur or mix-blend-mode) */}
         <div className="absolute inset-0 overflow-hidden bg-[#0a0a14]">
           <img
@@ -127,6 +171,7 @@ const HeroCarouselInner: React.FC<HeroCarouselProps> = ({
             src={bgUrl}
             alt={current.title}
             decoding="async"
+            draggable={false}
             className={`h-full w-full object-cover transition-opacity duration-300 ${
               hasBackdrop ? 'object-center' : 'object-center scale-105 opacity-35'
             }`}
@@ -150,7 +195,12 @@ const HeroCarouselInner: React.FC<HeroCarouselProps> = ({
             hasBackdrop ? 'hidden lg:block' : 'hidden sm:block'
           } absolute right-7 bottom-10 z-10 w-36 lg:w-44 aspect-[2/3] overflow-hidden rounded-2xl border border-white/25 shadow-2xl cursor-pointer md:hover:scale-[1.03] transition-transform`}
         >
-          <img src={posterUrl} alt={current.title} className="h-full w-full object-cover" />
+          <img
+            src={posterUrl}
+            alt={current.title}
+            draggable={false}
+            className="h-full w-full object-cover"
+          />
         </div>
 
         {/* Left / Right Subtle Navigation Arrows on Larger Screens */}

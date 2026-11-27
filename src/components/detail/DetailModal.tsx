@@ -83,23 +83,25 @@ export const DetailModal: React.FC<DetailModalProps> = ({
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [copiedNotice, setCopiedNotice] = useState(false);
+  const itemId = item?.id ?? null;
+
+  // Reset modal scroll ONLY when switching to a different catalog item
+  useEffect(() => {
+    if (!itemId) return;
+    scrollContainerRef.current?.scrollTo(0, 0);
+  }, [itemId]);
 
   useEffect(() => {
-    if (!item) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-
+    if (!itemId) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKeyDown);
 
     return () => {
-      document.body.style.overflow = prevOverflow;
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [item, onClose]);
+  }, [itemId, onClose]);
 
   const similarItems = useMemo(() => {
     if (!item) return [];
@@ -155,7 +157,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
       <div
         ref={scrollContainerRef}
         onClick={(e) => e.stopPropagation()}
-        className="slim-scrollbar relative z-10 h-[93vh] sm:h-auto sm:max-h-[90vh] w-full max-w-4xl overflow-y-auto overscroll-y-contain rounded-t-3xl sm:rounded-3xl border border-white/15 bg-[#090913] shadow-2xl"
+        className="slim-scrollbar relative z-10 h-[93vh] sm:h-auto sm:max-h-[90vh] w-full max-w-4xl overflow-y-auto overflow-x-hidden overscroll-y-contain rounded-t-3xl sm:rounded-3xl border border-white/15 bg-[#090913] shadow-2xl"
       >
         {/* Top Floating Controls (Solid smooth dark gradient, zero backdrop-blur for 60fps episode scrolling) */}
         <div className="sticky top-0 z-30 flex items-center justify-between gap-2 bg-gradient-to-b from-[#090913] via-[#090913]/90 to-transparent px-4 py-3">
@@ -222,6 +224,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
             src={backdropUrl}
             alt={item.title}
             decoding="async"
+            draggable={false}
             className={`h-full w-full object-cover ${
               item.backdrop_local ? 'object-center' : 'object-center scale-105 opacity-40'
             }`}
@@ -240,7 +243,12 @@ export const DetailModal: React.FC<DetailModalProps> = ({
           {/* Poster + Core Metadata Header */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
             <div className="w-28 sm:w-36 shrink-0 aspect-[2/3] overflow-hidden rounded-2xl border-2 border-white/20 shadow-[0_16px_40px_rgba(0,0,0,0.9)] bg-[#131324]">
-              <img src={posterUrl} alt={item.title} className="h-full w-full object-cover" />
+              <img
+                src={posterUrl}
+                alt={item.title}
+                draggable={false}
+                className="h-full w-full object-cover"
+              />
             </div>
 
             <div className="flex-1 min-w-0 pt-1 sm:pt-8 space-y-3">

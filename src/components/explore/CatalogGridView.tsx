@@ -45,7 +45,7 @@ export const CatalogGridView: React.FC<CatalogGridViewProps> = ({
     setLetter(context.initialFilter?.letter || 'ALL');
     setSort(context.initialFilter?.sort || 'latest');
     setVisibleCount(PAGE_SIZE);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   }, [context]);
 
   const baseSource = context.presetItems ?? allItems;

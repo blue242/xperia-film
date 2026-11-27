@@ -14,6 +14,11 @@
 - [x] Implementasi `DetailModal.tsx` lengkap pemilih Multi-part Film, Season/Episode Series berpenanda `✓`, pemilih Resolusi (`Otomatis`/`4K`/`1080p`/`720p`) & toggle urutan episode Donghua, serta integrasi penuh SDK `Telegram.WebApp`.
 - [x] Buat skrip bantu `scripts/setup_telegram_bot.py` & `scripts/sync_and_deploy.ps1`, setup GitHub Actions `.github/workflows/deploy.yml`, dan deploy live ke `https://blue242.github.io/xperia-film/`.
 
+## Selesai (Tahap 3 — Audit & Perbaikan Menyeluruh Mekanika Scroll Sentuh Mobile)
+- [x] Hapus pengunci `touch-pan-x` pada `ContentRail.tsx` dan seragamkan seluruh strip horizontal (`ContinueWatchingBar`, `AlphabetBar`, `SeriesEpisodePanel`, `CategoryTabView`) dengan `.horizontal-rail-scroll` (`touch-action: pan-x pan-y; overflow-y: hidden`) + `draggable={false}` pada poster/backdrop agar scroll vertikal halaman mulus 100% di atas poster.
+- [x] Optimasi gestur swipe `HeroCarousel.tsx` berbasis `useRef` (0% re-render saat sentuh, rasio arah `|dx| > 48 && |dx| > |dy| * 1.6`, `touch-action: pan-y`).
+- [x] Sentralisasi kunci scroll viewport modal di `App.tsx`, stabilisasi handler penutup dengan `useCallback`, pisahkan reset scroll `DetailModal.tsx` hanya saat `item.id` berubah, ganti perpindahan tab/grid menjadi `window.scrollTo(0, 0)` instan, dan rapikan CSS global (`luxury.css`).
+
 ## Pekerjaan Tertunda / Opsional Ke Depan
 - [ ] Menjalankan `python scripts/setup_telegram_bot.py` setelah user menyiapkan `BOT_TOKEN` baru dari `@BotFather`.
 - [ ] Opsional: Menjadwalkan Task Scheduler Windows mingguan untuk `scripts/sync_and_deploy.ps1` bila diinginkan sinkronisasi terjadwal otomatis.

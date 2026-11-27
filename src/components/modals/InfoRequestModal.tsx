@@ -34,7 +34,7 @@ export const InfoRequestModal: React.FC<InfoRequestModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="slim-scrollbar luxury-glass max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-3xl p-5 space-y-4"
+        className="slim-scrollbar luxury-glass max-h-[88vh] w-full max-w-lg overflow-y-auto overflow-x-hidden rounded-3xl p-5 space-y-4"
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">

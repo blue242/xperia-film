@@ -44,7 +44,9 @@ export const AlphabetBar: React.FC<AlphabetBarProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`no-scrollbar flex items-center gap-1 overflow-x-auto py-1 ${className}`}>
+    <div
+      className={`horizontal-rail-scroll no-scrollbar flex items-center gap-1 overflow-x-auto overflow-y-hidden py-1 ${className}`}
+    >
       {LETTERS.map((ltr) => {
         const isActive = activeLetter === ltr;
         return (

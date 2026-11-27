@@ -73,12 +73,12 @@ export const ContinueWatchingBar: React.FC<ContinueWatchingBarProps> = React.mem
 
         {/* Horizontal Scrollable Cards */}
         {!collapsed && (
-          <div className="no-scrollbar flex gap-2.5 overflow-x-auto px-3.5 pb-3.5 pt-0.5 sm:px-4">
+          <div className="horizontal-rail-scroll no-scrollbar flex gap-2.5 overflow-x-auto overflow-y-hidden px-3.5 pb-3.5 pt-0.5 sm:px-4">
             {entries.map((entry) => (
               <div
                 key={entry.itemId}
                 onClick={() => onOpenItemById(entry.itemId)}
-                className="group relative flex w-[250px] sm:w-[275px] shrink-0 cursor-pointer items-center gap-2.5 rounded-xl bg-black/55 hover:bg-black/75 border border-amber-300/20 hover:border-amber-300/45 p-2 transition-all"
+                className="group relative flex w-[250px] sm:w-[275px] shrink-0 cursor-pointer items-center gap-2.5 rounded-xl bg-black/55 hover:bg-black/75 border border-amber-300/20 hover:border-amber-300/45 p-2 transition-all select-none"
               >
                 {/* Poster Thumbnail */}
                 <div className="h-16 w-12 shrink-0 overflow-hidden rounded-lg border border-white/15 bg-[#121220]">
@@ -86,6 +86,7 @@ export const ContinueWatchingBar: React.FC<ContinueWatchingBarProps> = React.mem
                     src={resolveAssetUrl(entry.posterLocal)}
                     alt={entry.title}
                     loading="lazy"
+                    draggable={false}
                     className="h-full w-full object-cover"
                   />
                 </div>

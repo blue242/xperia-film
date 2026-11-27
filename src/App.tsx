@@ -68,6 +68,18 @@ export const App: React.FC = () => {
     initTelegramWebApp();
   }, []);
 
+  // Centralized modal scroll lock (prevents body overflow leak across modal transitions)
+  const anyModalOpen = Boolean(selectedItem) || searchOpen || rouletteOpen || infoOpen;
+
+  useEffect(() => {
+    document.documentElement.style.overflow = anyModalOpen ? 'hidden' : '';
+    document.body.style.overflow = anyModalOpen ? 'hidden' : '';
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, [anyModalOpen]);
+
   // Sync Telegram Native BackButton with UI Layer Stack
   useEffect(() => {
     const hasOverlay =
@@ -109,16 +121,21 @@ export const App: React.FC = () => {
       setExploreSubTab('filter');
     }
     setActiveTab(tab);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   }, []);
 
   const handleGoHomeTop = useCallback(() => {
     triggerHaptic('light');
+    const alreadyOnHome = activeTab === 'home' && !gridContext && !selectedItem;
     setSelectedItem(null);
     setGridContext(null);
     setActiveTab('home');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    if (alreadyOnHome) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [activeTab, gridContext, selectedItem]);
 
   const handleOpenWatchlist = useCallback(() => {
     triggerHaptic('selection');
@@ -126,7 +143,7 @@ export const App: React.FC = () => {
     setGridContext(null);
     setExploreSubTab('watchlist');
     setActiveTab('explore');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   }, []);
 
   const handleWatchNowImmediate = useCallback(
@@ -266,7 +283,7 @@ export const App: React.FC = () => {
       setSelectedItem(null);
       setGridContext(null);
       setActiveTab(cat);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
     },
     []
   );
@@ -297,6 +314,26 @@ export const App: React.FC = () => {
     setInfoOpen(true);
   }, []);
 
+  const handleCloseDetail = useCallback(() => {
+    setSelectedItem(null);
+  }, []);
+
+  const handleCloseSearch = useCallback(() => {
+    setSearchOpen(false);
+  }, []);
+
+  const handleCloseRoulette = useCallback(() => {
+    setRouletteOpen(false);
+  }, []);
+
+  const handleCloseInfo = useCallback(() => {
+    setInfoOpen(false);
+  }, []);
+
+  const handleCloseGrid = useCallback(() => {
+    setGridContext(null);
+  }, []);
+
   return (
     <div className="relative min-h-screen w-full text-slate-100 pb-safe-dock">
       {/* Dynamic Ambient Aurora Backdrop (Zero CSS blur, event-driven without re-rendering App) */}
@@ -320,7 +357,7 @@ export const App: React.FC = () => {
             <CatalogGridView
               context={gridContext}
               allItems={allItems}
-              onClose={() => setGridContext(null)}
+              onClose={handleCloseGrid}
               onSelectItem={setSelectedItem}
               onTagGenre={handleTagGenre}
               onTagPlatform={handleTagPlatform}
@@ -373,7 +410,7 @@ export const App: React.FC = () => {
               watchlistItems={watchlistItems}
               initialSubTab={exploreSubTab}
               onSelectItem={setSelectedItem}
-              onOpenRoulette={() => setRouletteOpen(true)}
+              onOpenRoulette={handleOpenRoulette}
               onTagGenre={handleTagGenre}
               onTagPlatform={handleTagPlatform}
               onTagStudio={handleTagStudio}
@@ -396,7 +433,7 @@ export const App: React.FC = () => {
         onRecordWatch={recordWatch}
         donghuaResPref={donghuaResPref}
         onChangeDonghuaResPref={setDonghuaResPref}
-        onClose={() => setSelectedItem(null)}
+        onClose={handleCloseDetail}
         onSelectItem={setSelectedItem}
         onFilterCategory={handleFilterCategory}
         onFilterGenre={handleTagGenre}
@@ -412,7 +449,7 @@ export const App: React.FC = () => {
       <SearchOverlay
         isOpen={searchOpen}
         allItems={allItems}
-        onClose={() => setSearchOpen(false)}
+        onClose={handleCloseSearch}
         onSelectItem={setSelectedItem}
         onOpenGrid={openTagGrid}
       />
@@ -421,7 +458,7 @@ export const App: React.FC = () => {
       <RouletteModal
         isOpen={rouletteOpen}
         allItems={allItems}
-        onClose={() => setRouletteOpen(false)}
+        onClose={handleCloseRoulette}
         onOpenDetail={setSelectedItem}
         onWatchNow={handleWatchNowImmediate}
       />
@@ -430,7 +467,7 @@ export const App: React.FC = () => {
       <InfoRequestModal
         isOpen={infoOpen}
         stats={stats}
-        onClose={() => setInfoOpen(false)}
+        onClose={handleCloseInfo}
       />
     </div>
   );

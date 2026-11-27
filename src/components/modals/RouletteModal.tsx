@@ -22,6 +22,14 @@ export const RouletteModal: React.FC<RouletteModalProps> = ({
   const [scope, setScope] = useState<'all' | CategoryType>('all');
   const [spinning, setSpinning] = useState(false);
   const [picked, setPicked] = useState<CatalogItem | null>(null);
+  const spinIntervalRef = React.useRef<number | null>(null);
+
+  const clearSpinInterval = () => {
+    if (spinIntervalRef.current !== null) {
+      window.clearInterval(spinIntervalRef.current);
+      spinIntervalRef.current = null;
+    }
+  };
 
   const pool = useMemo(() => {
     if (scope === 'all') return allItems;
@@ -32,18 +40,19 @@ export const RouletteModal: React.FC<RouletteModalProps> = ({
     const activePool = customPool ?? pool;
     if (activePool.length === 0) return;
 
+    clearSpinInterval();
     setSpinning(true);
     let step = 0;
     const totalSteps = 11;
 
-    const interval = window.setInterval(() => {
+    spinIntervalRef.current = window.setInterval(() => {
       const rnd = activePool[Math.floor(Math.random() * activePool.length)];
       setPicked(rnd);
       triggerHaptic('selection');
       step += 1;
 
       if (step >= totalSteps) {
-        window.clearInterval(interval);
+        clearSpinInterval();
         const finalChoice = activePool[Math.floor(Math.random() * activePool.length)];
         setPicked(finalChoice);
         setSpinning(false);
@@ -55,7 +64,13 @@ export const RouletteModal: React.FC<RouletteModalProps> = ({
   useEffect(() => {
     if (isOpen && allItems.length > 0) {
       spinNow(pool);
+    } else if (!isOpen) {
+      clearSpinInterval();
+      setSpinning(false);
     }
+    return () => {
+      clearSpinInterval();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
@@ -71,7 +86,7 @@ export const RouletteModal: React.FC<RouletteModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="luxury-glass relative w-full max-w-md overflow-hidden rounded-3xl p-5"
+        className="slim-scrollbar luxury-glass relative max-h-[90vh] w-full max-w-md overflow-y-auto overflow-x-hidden rounded-3xl p-5"
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
@@ -142,6 +157,7 @@ export const RouletteModal: React.FC<RouletteModalProps> = ({
                 <img
                   src={resolveAssetUrl(picked.poster_local)}
                   alt={picked.title}
+                  draggable={false}
                   className={`h-full w-full object-cover transition-transform duration-200 ${
                     spinning ? 'scale-105 blur-[1px]' : 'scale-100'
                   }`}

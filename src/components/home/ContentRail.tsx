@@ -102,10 +102,10 @@ const ContentRailInner: React.FC<ContentRailProps> = ({
         </div>
       </div>
 
-      {/* Horizontal Card Track (touch-pan-x + overscroll-x-contain for smooth 60fps mobile) */}
+      {/* Horizontal Card Track (bi-directional pan-x pan-y so vertical page scroll never locks on posters) */}
       <div
         ref={scrollRef}
-        className="no-scrollbar flex gap-2.5 sm:gap-3.5 overflow-x-auto overscroll-x-contain touch-pan-x px-3 sm:px-5 pb-1"
+        className="horizontal-rail-scroll no-scrollbar flex gap-2.5 sm:gap-3.5 overflow-x-auto overflow-y-hidden px-3 sm:px-5 pb-1"
       >
         {visibleItems.map((item) => (
           <div

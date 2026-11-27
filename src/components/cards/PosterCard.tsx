@@ -75,6 +75,7 @@ const PosterCardInner: React.FC<PosterCardProps> = ({
             alt={item.title}
             loading="lazy"
             decoding="async"
+            draggable={false}
             onLoad={() => setImgLoaded(true)}
             onError={() => setImgError(true)}
             className={`h-full w-full object-cover transition-opacity duration-200 md:transition-transform md:duration-300 md:group-hover:scale-105 ${

@@ -96,7 +96,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
         </div>
 
         {/* Results or Quick Suggestions */}
-        <div className="slim-scrollbar flex-1 overflow-y-auto p-4">
+        <div className="slim-scrollbar flex-1 overflow-y-auto overflow-x-hidden p-4">
           {!query.trim() ? (
             <div className="space-y-4">
               <div>
@@ -209,6 +209,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
                         src={resolveAssetUrl(item.poster_local)}
                         alt={item.title}
                         loading="lazy"
+                        draggable={false}
                         className="h-full w-full object-cover"
                       />
                     </div>

@@ -375,7 +375,7 @@ const CategoryTabViewInner: React.FC<CategoryTabViewProps> = ({
       <section className="mx-auto mt-4 w-full max-w-7xl px-3 sm:px-5">
         <div className="luxury-glass rounded-2xl p-3.5 sm:p-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto max-w-full pb-0.5">
+            <div className="horizontal-rail-scroll no-scrollbar flex items-center gap-1.5 overflow-x-auto overflow-y-hidden max-w-full py-0.5">
               {topGenres.map((g) => (
                 <button
                   key={g}
