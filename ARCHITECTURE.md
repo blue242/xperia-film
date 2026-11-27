@@ -1,35 +1,30 @@
 # ARCHITECTURE — Xperia Film Mini App
 
-## 1. Arsitektur 2 Lapisan Terisolasi
+## 1. Arsitektur Multi-Perangkat (`upmini`)
 
-### A. Data Pipeline & Poster Engine (Remote Termux Realme)
-Lokasi: `~/DOPESSORNO/xperia_film_sync/` (membaca sumber secara *read-only*):
-- `config_sync.py` — Loader kredensial `~/.config/dopessorno/media_hub/environment`, `~/DOPESSORNO/donghua_catalog/`, dan `TMDB_API_KEY`.
-- `session_guard.py` — `safe_telegram_client` yang menyalin `.session` ke `$TMPDIR/xperia_sync_sessions/` (`receive_updates=False`) agar bebas SQLite lock.
+### A. Data Pipeline & Poster Engine (Termux Realme & Termux Xperia)
+Lokasi sinkronisasi: `~/DOPESSORNO/xperia_film_sync/` (membaca sumber secara *read-only*) + clone deploy `~/DOPESSORNO/xperia_film_repo/` (via SSH deploy key `github-xperia-film`):
+- `config_sync.py` — Loader kredensial `~/.config/dopessorno/media_hub/environment`, `~/DOPESSORNO/donghua_catalog/`, `TMDB_API_KEY`, `MEDIA_HUB_DIR`, dan `DONGHUA_SOURCES_PATH`.
+- `session_guard.py` — `safe_telegram_client` yang menyalin `.session` sementara ke `$TMPDIR/xperia_sync_sessions/` (`receive_updates=False`) agar bebas SQLite lock dan otomatis terhapus di `finally:`.
 - `enricher_api.py` — Enricher konkuren ke TMDB v3 & AniList GraphQL + cache `cache/api_cache.json`.
 - `poster_downloader.py` — Konverter `.webp` (`420px` poster, `1280px` hero backdrop) + ekstraktor `accent_color` vibran.
-- `collector_movies.py`, `collector_series.py`, `collector_donghua.py` — Kolektor metadata & episode multi-resolusi.
-- `exporter.py` & `run_sync.py` — Validator mandiri & ekspor JSON atomik ke `output/`.
+- `collector_movies.py` — Kolektor film `@film_fast_update` (termasuk multi-part & resolusi).
+- `collector_series.py` — Live scanner `@Gudang_Series_Terbaru` (impor *read-only* `SeriesChannelScanner`, `parse_series_meta`, `parse_series_episode`, & `build_series_index` dari `~/DOPESSORNO/media_hub/series_index/`, fallback ke `series_catalog.json`).
+- `collector_donghua.py` — Union sumber channel publik lintas HP (`~/DOPESSORNO/donghua_catalog/donghua.json` + `output/data/donghua_sources.json` tanpa kredensial) + kolektor episode multi-resolusi.
+- `exporter.py` — Validator mandiri & ekspor JSON atomik ke `output/` (menjaga `updated_at` bila tidak ada perubahan katalog).
+- `run_sync.py` — Entrypoint sinkronisasi penuh & mode cepat parsial (`--only all|film|series|donghua`).
+- `upmini.sh` — Orkestrator 1-perintah Termux (terpasang di `/data/data/com.termux/files/usr/bin/upmini`): `git reset --hard origin/main`, sync baseline, jalankan `run_sync.py`, perbarui `public/`, commit & push bila ada perubahan.
 
-### B. Frontend Modular Anti-Monolith (PC Acer & GitHub Pages)
+### B. Frontend Modular Anti-Monolith & Orkestrator PC Ryzen
 Lokasi: `c:\Users\server\katalog_mini_app\` (Stack: React 18, TypeScript, Vite 6, Tailwind CSS 3, Lucide Icons):
 - `src/types/catalog.ts` — Kontrak tipe data katalog, filter, riwayat tontonan, dan konteks grid.
-- `src/utils/`
-  - `telegram.ts` — Integrasi Telegram WebApp SDK (`ready`, `expand`, `disableVerticalSwipes`, `BackButton` stack, `HapticFeedback`, `openTelegramLink`, `shareCatalogItem`).
-  - `assetUrl.ts` — Resolver path relatif `./` untuk GitHub Pages, konversi RGB ambient glow, dan palet warna genre/platform.
-  - `catalogHelpers.ts` — Mesin pencari instan, multi-filter, pengurut, dan kurasi tontonan serupa.
-- `src/hooks/`
-  - `useCatalogData.ts` — Loader paralel keempat file JSON + indeks `Map` per `id`.
-  - `useUserLibrary.ts` — Persistensi `localStorage` untuk Watchlist, Continue Watching, penanda episode `✓`, dan preferensi resolusi Donghua.
-- `src/components/layout/` — `AmbientBackground.tsx`, `BrandLogo.tsx`, `TopHeader.tsx`, `BottomNav.tsx`, `CatalogStateScreen.tsx`.
-- `src/components/cards/` — `PosterCard.tsx` (kartu 2:3 dengan 4-sudut badge khas per kategori).
-- `src/components/home/` — `HeroCarousel.tsx`, `ContinueWatchingBar.tsx`, `StatsRibbon.tsx`, `ContentRail.tsx`, `HomeTabView.tsx`, `CategoryTabView.tsx`.
-- `src/components/explore/` — `AlphabetBar.tsx`, `CatalogGridView.tsx` (Grid 3 Kolom + Load More 36 item), `SuperExplorerView.tsx`.
-- `src/components/detail/` — `DetailModal.tsx`, `MovieWatchPanel.tsx`, `SeriesEpisodePanel.tsx`, `DonghuaEpisodePanel.tsx`.
-- `src/components/modals/` — `SearchOverlay.tsx`, `RouletteModal.tsx`, `InfoRequestModal.tsx`.
-- `index.html` — Entry HTML dengan Telegram WebApp SDK, font `Outfit` / `Plus Jakarta Sans`, `apple-touch-icon`, serta meta OpenGraph (`og:title`, `og:description`, `og:image` ke `bot-avatar.jpg`).
+- `src/utils/` — `telegram.ts`, `assetUrl.ts`, `catalogHelpers.ts`.
+- `src/hooks/` — `useCatalogData.ts`, `useUserLibrary.ts`.
+- `src/components/` — Komponen modular di subfolder `layout/`, `cards/`, `home/`, `explore/`, `detail/`, `modals/`.
+- `index.html` — Entry HTML dengan Telegram WebApp SDK, font `Outfit` / `Plus Jakarta Sans`, `apple-touch-icon`, serta meta OpenGraph (`og:image` -> `bot-avatar.jpg`).
 - `public/bot-avatar.jpg` — Aset foto profil resmi `@xperiafilm_bot` (`640x640` RGB JPEG) sekaligus thumbnail share link OpenGraph.
-- `scripts/setup_telegram_bot.py` — Konfigurator profil & Mini App `@xperiafilm_bot` berbasis stdlib Python (`urllib`, `mimetypes`, `uuid`) untuk `setMyProfilePhoto`, `setChatMenuButton`, bio, deskripsi, `/start`, dan `--verify-only`.
-- `scripts/sync_and_deploy.ps1` — Skrip sinkronisasi 1-klik Termux Realme -> `public/` -> GitHub Pages.
+- `public/data/` — `movies.json`, `series.json`, `donghua.json`, `catalog_stats.json`, dan `donghua_sources.json` (non-rahasia, 0 kredensial).
+- `scripts/setup_telegram_bot.py` — Konfigurator profil & Mini App `@xperiafilm_bot` berbasis stdlib Python (`--verify-only`, `setMyProfilePhoto`, `setChatMenuButton`, bio, deskripsi, `/start`).
+- `scripts/sync_and_deploy.ps1` & `upmini.cmd` — Orkestrator PC Ryzen: deteksi otomatis HP aktif (`realme` -> `xperia` -> scan `arp -a` port `8022`), eksekusi `upmini` remote via SSH, dan `git pull --rebase origin main`.
 - `src/App.tsx` & `src/main.tsx` — Koordinator state navigasi & entrypoint aplikasi.
 - `.github/workflows/deploy.yml` — Workflow GitHub Actions pembangun `dist/` dan deployer otomatis ke `https://blue242.github.io/xperia-film/`.

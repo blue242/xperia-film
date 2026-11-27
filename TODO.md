@@ -15,16 +15,20 @@
 - [x] Buat skrip bantu `scripts/setup_telegram_bot.py` & `scripts/sync_and_deploy.ps1`, setup GitHub Actions `.github/workflows/deploy.yml`, dan deploy live ke `https://blue242.github.io/xperia-film/`.
 
 ## Selesai (Tahap 3 — Audit & Perbaikan Menyeluruh Mekanika Scroll Sentuh Mobile)
-- [x] Hapus pengunci `touch-pan-x` pada `ContentRail.tsx` dan seragamkan seluruh strip horizontal (`ContinueWatchingBar`, `AlphabetBar`, `SeriesEpisodePanel`, `CategoryTabView`) dengan `.horizontal-rail-scroll` (`touch-action: pan-x pan-y; overflow-y: hidden`) + `draggable={false}` pada poster/backdrop agar scroll vertikal halaman mulus 100% di atas poster.
-- [x] Optimasi gestur swipe `HeroCarousel.tsx` berbasis `useRef` (0% re-render saat sentuh, rasio arah `|dx| > 48 && |dx| > |dy| * 1.6`, `touch-action: pan-y`).
-- [x] Sentralisasi kunci scroll viewport modal di `App.tsx`, stabilisasi handler penutup dengan `useCallback`, pisahkan reset scroll `DetailModal.tsx` hanya saat `item.id` berubah, ganti perpindahan tab/grid menjadi `window.scrollTo(0, 0)` instan, dan rapikan CSS global (`luxury.css`).
+- [x] Hapus pengunci `touch-pan-x` pada `ContentRail.tsx` dan seragamkan seluruh strip horizontal dengan `.horizontal-rail-scroll` + `draggable={false}` pada poster/backdrop agar scroll vertikal halaman mulus 100%.
+- [x] Optimasi gestur swipe `HeroCarousel.tsx` berbasis `useRef` (0% re-render saat sentuh, `touch-action: pan-y`).
+- [x] Sentralisasi kunci scroll viewport modal di `App.tsx`, stabilisasi handler penutup dengan `useCallback`, dan rapikan CSS global (`luxury.css`).
 
 ## Selesai (Tahap 4 — Integrasi Penuh Bot `@xperiafilm_bot` & Branding)
-- [x] Ekspor aset foto profil resmi `public/bot-avatar.jpg` (`640x640` RGB JPEG, `quality=95`, `subsampling=0`).
-- [x] Upgrade `scripts/setup_telegram_bot.py` (murni stdlib Python) untuk upload `setMyProfilePhoto`, pasang menu WebApp `🎬 Buka Katalog`, `setMyShortDescription`, `setMyDescription`, `setMyCommands` (`/start`), dan mode `--verify-only`.
-- [x] Eksekusi & verifikasi live Bot API pada `@xperiafilm_bot` (PP kustom aktif `total_count=1`, Menu WebApp mengarah ke `https://blue242.github.io/xperia-film/`, bio & deskripsi terpasang).
-- [x] Tambahkan meta OpenGraph (`og:title`, `og:description`, `og:image`) dan `apple-touch-icon` di `index.html` + verifikasi `npm run build`.
+- [x] Ekspor aset foto profil resmi `public/bot-avatar.jpg` (`640x640` RGB JPEG) dan lengkapi meta OpenGraph + `apple-touch-icon` di `index.html`.
+- [x] Upgrade `scripts/setup_telegram_bot.py` untuk `setMyProfilePhoto`, menu WebApp `🎬 Buka Katalog`, bio, deskripsi, `/start`, dan `--verify-only`.
+
+## Selesai (Tahap 5 — Multi-Device One-Command Sync `upmini`)
+- [x] Upgrade `collector_series.py` untuk live scan `@Gudang_Series_Terbaru` (impor *read-only* `series_index` di `~/DOPESSORNO/media_hub`, fallback ke `series_catalog.json`).
+- [x] Tambahkan union sumber donghua lintas HP (`donghua.json` + `donghua_sources.json` non-rahasia) di `collector_donghua.py` & mode cepat `--only all|film|series|donghua` di `run_sync.py` + `exporter.py`.
+- [x] Daftarkan SSH deploy key `github-xperia-film` (read-write) ke `blue242/xperia-film`, pasang `upmini.sh` -> `/data/data/com.termux/files/usr/bin/upmini`, serta clone `xperia_film_repo` di **Realme** dan **Xperia**.
+- [x] Upgrade `scripts/sync_and_deploy.ps1` (deteksi otomatis Realme/Xperia/ARP port 8022 -> remote `upmini` -> `git pull --rebase`), tambah `upmini.cmd`, dan tambah script `"sync"` di `package.json`.
 
 ## Pekerjaan Tertunda / Opsional Ke Depan
 - [ ] Opsional: Aktifkan Main Mini App via `@BotFather` (`/setmainapp` -> `@xperiafilm_bot`) bila ingin `has_main_web_app=true` untuk direct link `https://t.me/xperiafilm_bot?startapp`.
-- [ ] Opsional: Menjadwalkan Task Scheduler Windows mingguan untuk `scripts/sync_and_deploy.ps1` bila diinginkan sinkronisasi terjadwal otomatis.
+- [ ] Opsional: Menjadwalkan Task Scheduler Windows mingguan untuk `upmini.cmd` bila diinginkan sinkronisasi terjadwal otomatis.

@@ -13,11 +13,16 @@ Katalog streaming sinematik berbasis **Telegram Mini App** untuk koleksi **Film 
 - **Pemilih Episode & Resolusi Lengkap:** Multi-part Film, Season + Episode Series dengan penanda `✓` sudah ditonton, serta pemilih resolusi (`Otomatis`/`4K`/`1080p`/`720p`) & urutan episode terbaru untuk Donghua.
 - **Fitur Personal:** Bar emas `▶ Lanjutkan Menonton`, `❤️ Simpanan Gua (Watchlist)`, `🎲 Cinema Roulette`, dan Live Search instan.
 
+## Update Katalog 1 Perintah (`upmini`)
+- **Termux HP Realme / Sony Xperia:** jalankan `upmini` (penuh), `upmini film`, `upmini series`, atau `upmini donghua` (Wi-Fi maupun paket data seluler).
+- **PC Ryzen:** jalankan `.\upmini.cmd` (`all|film|series|donghua`), atau `npm run sync`. Otomatis mencari HP Termux aktif (`Realme` -> `Xperia` -> scan ARP port `8022`), menjalankan `upmini` di HP, lalu `git pull --rebase origin main`.
+
 ## Struktur Folder
 - `index.html` — Entrypoint WebApp dilengkapi OpenGraph preview (`og:image` -> `bot-avatar.jpg`) & `apple-touch-icon`.
 - `src/` — Kode frontend modular React 18 + TypeScript + Tailwind CSS (`types/`, `utils/`, `hooks/`, `components/{layout,cards,home,explore,detail,modals}/`).
 - `public/` — `bot-avatar.jpg` (PP sinema `640x640` & thumbnail share), `data/`, & `posters/` (390 gambar `.webp` lokal).
-- `scripts/` — `setup_telegram_bot.py` (konfigurator penuh `@xperiafilm_bot` tanpa menyimpan token) & `sync_and_deploy.ps1` (satu-klik sinkronisasi Realme -> GitHub Pages).
+- `scripts/` — `setup_telegram_bot.py` (konfigurator `@xperiafilm_bot` tanpa menyimpan token) & `sync_and_deploy.ps1` (orkestrator multi-device PC Ryzen).
+- `upmini.cmd` — Launcher singkat sinkronisasi satu klik dari Windows.
 - `.github/workflows/deploy.yml` — Pipeline CI/CD otomatis ke GitHub Pages.
 
 ## Menjalankan Lokal
