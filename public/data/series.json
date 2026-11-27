@@ -14,9 +14,9 @@
       "Romance"
     ],
     "season_label": "S.1",
-    "latest_episode": 8,
+    "latest_episode": 10,
     "total_episodes": 10,
-    "uploaded_episodes": 8,
+    "uploaded_episodes": 10,
     "director": "Cho Su-won",
     "cast": [
       "Shin Min-a",
@@ -28,7 +28,7 @@
     "synopsis": "Navier adalah seorang permaisuri yang dikhianati suaminya, Kaisar Sovieshu, setelah sang kaisar jatuh cinta kepada wanita lain dan meminta perceraian. Navier menerima keputusan itu dengan satu syarat: ia diizinkan menikah kembali dengan Pangeran Heinrey dari Kerajaan Barat. Keputusan tersebut menjadi awal kisah cinta, pengkhianatan, dan intrik politik yang mengguncang dua kerajaan.",
     "poster_message_id": 300,
     "poster_link": "https://t.me/Gudang_Series_Terbaru/300",
-    "latest_update": "2026-11-25T16:03:04+00:00",
+    "latest_update": "2026-11-27T10:16:02+00:00",
     "seasons": {
       "1": [
         {
@@ -70,6 +70,16 @@
           "episode": 8,
           "message_id": 317,
           "link": "https://t.me/Gudang_Series_Terbaru/317"
+        },
+        {
+          "episode": 9,
+          "message_id": 318,
+          "link": "https://t.me/Gudang_Series_Terbaru/318"
+        },
+        {
+          "episode": 10,
+          "message_id": 319,
+          "link": "https://t.me/Gudang_Series_Terbaru/319"
         }
       ]
     },
