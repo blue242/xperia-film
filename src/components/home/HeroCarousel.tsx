@@ -1,0 +1,352 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Check, ChevronLeft, ChevronRight, Info, Play, Plus } from 'lucide-react';
+import type { CatalogItem } from '../../types/catalog';
+import {
+  getGenrePalette,
+  hexToRgbString,
+  resolveAssetUrl,
+  splitCountries,
+} from '../../utils/assetUrl';
+import { isItemCompleted } from '../../utils/catalogHelpers';
+import { triggerHaptic } from '../../utils/telegram';
+
+interface HeroCarouselProps {
+  items: CatalogItem[];
+  isSaved: (id: string) => boolean;
+  onToggleSave: (id: string) => void;
+  onWatchNow: (item: CatalogItem) => void;
+  onOpenDetail: (item: CatalogItem) => void;
+  onSelectGenre: (genre: string) => void;
+  onSelectYear: (year: number) => void;
+  onSelectCountry: (country: string) => void;
+  onAccentChange?: (accentColor?: string | null) => void;
+}
+
+export const HeroCarousel: React.FC<HeroCarouselProps> = ({
+  items,
+  isSaved,
+  onToggleSave,
+  onWatchNow,
+  onOpenDetail,
+  onSelectGenre,
+  onSelectYear,
+  onSelectCountry,
+  onAccentChange,
+}) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [items]);
+
+  const safeIndex = items.length > 0 ? activeIndex % items.length : 0;
+  const current = items[safeIndex];
+
+  useEffect(() => {
+    if (current && onAccentChange) {
+      onAccentChange(current.accent_color);
+    }
+  }, [current, onAccentChange]);
+
+  useEffect(() => {
+    if (items.length <= 1 || isPaused) return;
+    const timer = window.setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % items.length);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [items.length, isPaused]);
+
+  if (!current) return null;
+
+  const accentRgb = hexToRgbString(current.accent_color, '225, 29, 72');
+  const hasBackdrop = Boolean(current.backdrop_local);
+  const bgUrl = resolveAssetUrl(current.backdrop_local || current.poster_local);
+  const posterUrl = resolveAssetUrl(current.poster_local);
+  const saved = isSaved(current.id);
+  const countries = splitCountries(current.country);
+  const completed = isItemCompleted(current);
+
+  const badgeConfig =
+    current.category === 'movies'
+      ? {
+          text: '🎬 FILM UNGGULAN',
+          gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
+        }
+      : current.category === 'series'
+      ? {
+          text: '📺 SERIES HITS',
+          gradient: 'from-purple-600 via-fuchsia-500 to-pink-500',
+        }
+      : {
+          text: '🐉 DONGHUA POPULER',
+          gradient: 'from-rose-600 via-orange-500 to-amber-500',
+        };
+
+  const goPrev = () => {
+    triggerHaptic('selection');
+    setActiveIndex((prev) => (prev - 1 + items.length) % items.length);
+  };
+
+  const goNext = () => {
+    triggerHaptic('selection');
+    setActiveIndex((prev) => (prev + 1) % items.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current !== null) {
+      const delta = e.changedTouches[0].clientX - touchStartX.current;
+      if (Math.abs(delta) > 42) {
+        if (delta < 0) goNext();
+        else goPrev();
+      }
+    }
+    touchStartX.current = null;
+    window.setTimeout(() => setIsPaused(false), 1500);
+  };
+
+  return (
+    <section
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="relative mx-auto w-full max-w-7xl px-3 pt-3 sm:px-5 sm:pt-4"
+    >
+      <div
+        className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 shadow-[0_22px_55px_-12px_rgba(0,0,0,0.88)] min-h-[340px] sm:min-h-[410px] lg:min-h-[450px] flex items-end"
+        style={{
+          boxShadow: `0 24px 55px -15px rgba(0,0,0,0.9), 0 0 42px -12px rgba(${accentRgb}, 0.45)`,
+          transition: 'box-shadow 800ms ease',
+        }}
+      >
+        {/* Widescreen Backdrop Layer */}
+        <div className="absolute inset-0 overflow-hidden bg-[#0a0a14]">
+          <img
+            key={current.id}
+            src={bgUrl}
+            alt={current.title}
+            className={`h-full w-full object-cover transition-all duration-700 ${
+              hasBackdrop
+                ? 'object-center scale-[1.02]'
+                : 'object-center scale-125 blur-xl opacity-55'
+            }`}
+          />
+
+          {/* Multi-stop cinematic dark & accent vignette overlays */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#06060b] via-[#06060b]/70 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#06060b]/95 via-[#06060b]/55 to-transparent" />
+          <div
+            className="absolute inset-0 opacity-45 mix-blend-screen pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at 82% 22%, rgba(${accentRgb}, 0.42), transparent 58%)`,
+              transition: 'background 800ms ease',
+            }}
+          />
+        </div>
+
+        {/* Desktop / Non-backdrop Crisp Floating Poster Accent */}
+        <div
+          onClick={() => onOpenDetail(current)}
+          className={`${
+            hasBackdrop ? 'hidden lg:block' : 'hidden sm:block'
+          } absolute right-7 bottom-10 z-10 w-36 lg:w-44 aspect-[2/3] overflow-hidden rounded-2xl border border-white/25 shadow-[0_18px_40px_rgba(0,0,0,0.85)] cursor-pointer hover:scale-[1.03] transition-transform`}
+        >
+          <img src={posterUrl} alt={current.title} className="h-full w-full object-cover" />
+        </div>
+
+        {/* Left / Right Subtle Navigation Arrows on Larger Screens */}
+        {items.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label="Slide Sebelumnya"
+              className="hidden sm:flex absolute left-3 top-1/2 z-20 -translate-y-1/2 h-9 w-9 items-center justify-center rounded-full bg-black/45 hover:bg-black/75 border border-white/15 text-white backdrop-blur-md transition-all"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={goNext}
+              aria-label="Slide Berikutnya"
+              className="hidden sm:flex absolute right-3 top-1/2 z-20 -translate-y-1/2 h-9 w-9 items-center justify-center rounded-full bg-black/45 hover:bg-black/75 border border-white/15 text-white backdrop-blur-md transition-all"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </>
+        )}
+
+        {/* Foreground Spotlight Content */}
+        <div className="relative z-10 w-full max-w-2xl p-4 sm:p-7 lg:p-9">
+          {/* Category Badge + Live Status */}
+          <div className="mb-2.5 flex flex-wrap items-center gap-2">
+            <span
+              className={`inline-flex items-center rounded-full bg-gradient-to-r ${badgeConfig.gradient} px-2.5 py-0.5 text-[10px] sm:text-[11px] font-black tracking-wider text-white shadow-lg border border-white/25`}
+            >
+              {badgeConfig.text}
+            </span>
+
+            {current.rating && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/65 backdrop-blur-md border border-amber-400/40 px-2.5 py-0.5 text-[11px] font-extrabold text-amber-300">
+                ⭐ {current.rating.toFixed(1)}
+              </span>
+            )}
+
+            {current.year && (
+              <button
+                type="button"
+                onClick={() => onSelectYear(current.year!)}
+                className="rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md border border-white/15 px-2.5 py-0.5 text-[11px] font-bold text-slate-100 transition-colors"
+              >
+                {current.year}
+              </button>
+            )}
+
+            {countries[0] && (
+              <button
+                type="button"
+                onClick={() => onSelectCountry(countries[0])}
+                className="rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-md border border-white/15 px-2.5 py-0.5 text-[11px] font-bold text-slate-200 transition-colors"
+              >
+                {countries[0]}
+              </button>
+            )}
+
+            {/* Duration / Episode / Quality Chip */}
+            {current.category === 'movies' && (
+              <span className="rounded-full bg-emerald-500/20 border border-emerald-400/35 px-2.5 py-0.5 text-[11px] font-extrabold text-emerald-300">
+                {current.quality || 'HD'}
+                {current.duration_label ? ` • ${current.duration_label}` : ''}
+              </span>
+            )}
+            {current.category === 'series' && (
+              <span className="rounded-full bg-fuchsia-500/25 border border-fuchsia-400/35 px-2.5 py-0.5 text-[11px] font-extrabold text-fuchsia-200">
+                {current.season_label || 'S.1'} • Ep {current.latest_episode || 1}
+              </span>
+            )}
+            {current.category === 'donghua' && (
+              <span className="rounded-full bg-amber-500/25 border border-amber-400/40 px-2.5 py-0.5 text-[11px] font-extrabold text-amber-200">
+                Ep {current.latest_episode || 1} {completed ? 'END' : 'Ongoing'} • Sub Indo
+              </span>
+            )}
+          </div>
+
+          {/* Hero Title */}
+          <h1
+            onClick={() => onOpenDetail(current)}
+            className="cursor-pointer font-display text-2xl sm:text-4xl lg:text-[42px] font-black leading-[1.08] tracking-tight text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.9)] line-clamp-2 hover:text-amber-200 transition-colors"
+          >
+            {current.title}
+          </h1>
+
+          {/* Clickable Genre Capsules */}
+          {current.genres && current.genres.length > 0 && (
+            <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+              {current.genres.slice(0, 4).map((genre) => {
+                const pal = getGenrePalette(genre);
+                return (
+                  <button
+                    key={genre}
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('selection');
+                      onSelectGenre(genre);
+                    }}
+                    className={`rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold backdrop-blur-md transition-all ${pal.bg} ${pal.text} ${pal.border}`}
+                  >
+                    {genre}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* 2-Line Synopsis Excerpt */}
+          {current.synopsis && (
+            <p className="mt-2.5 max-w-xl text-xs sm:text-sm leading-relaxed text-slate-200/90 line-clamp-2 drop-shadow">
+              {current.synopsis}
+            </p>
+          )}
+
+          {/* Action Buttons */}
+          <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-2.5">
+            <button
+              type="button"
+              onClick={() => onWatchNow(current)}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-600 via-red-600 to-amber-500 hover:brightness-110 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-extrabold text-white shadow-[0_8px_24px_rgba(225,29,72,0.55)] border border-white/25 active:scale-95 transition-all"
+            >
+              <Play className="h-4 w-4 fill-white" />
+              <span>Tonton Sekarang</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                onOpenDetail(current);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl luxury-glass-pill hover:bg-white/15 px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-white active:scale-95 transition-all"
+            >
+              <Info className="h-4 w-4 text-amber-300" />
+              <span>Detail</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onToggleSave(current.id)}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold border backdrop-blur-md active:scale-95 transition-all ${
+                saved
+                  ? 'bg-amber-500/25 border-amber-400/50 text-amber-200'
+                  : 'luxury-glass-pill hover:bg-white/15 text-slate-200'
+              }`}
+            >
+              {saved ? (
+                <>
+                  <Check className="h-4 w-4 text-amber-300" />
+                  <span>Tersimpan</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 text-slate-200" />
+                  <span>Simpan</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Interactive Slide Dots */}
+          {items.length > 1 && (
+            <div className="mt-4 flex items-center gap-1.5">
+              {items.map((slide, idx) => {
+                const active = idx === safeIndex;
+                return (
+                  <button
+                    key={slide.id}
+                    type="button"
+                    aria-label={`Slide ${idx + 1}: ${slide.title}`}
+                    onClick={() => {
+                      triggerHaptic('selection');
+                      setActiveIndex(idx);
+                    }}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      active
+                        ? 'w-7 bg-gradient-to-r from-rose-500 to-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]'
+                        : 'w-2 bg-white/25 hover:bg-white/50'
+                    }`}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
