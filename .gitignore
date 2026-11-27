@@ -11,6 +11,7 @@ dist-ssr/
 *.session-journal
 *secret*
 *credentials*
+!public/posters/**/*.webp
 
 # Logs & Temp
 *.log
