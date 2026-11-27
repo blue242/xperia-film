@@ -58,11 +58,6 @@ export const App: React.FC = () => {
   const [exploreSubTab, setExploreSubTab] = useState<'filter' | 'watchlist'>('filter');
   const [gridContext, setGridContext] = useState<GridViewContext | null>(null);
   const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
-  const [heroAccent, setHeroAccent] = useState<string | null>('#e11d48');
-
-  const handleHeroAccentChange = useCallback((color?: string | null) => {
-    setHeroAccent(color || '#e11d48');
-  }, []);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [rouletteOpen, setRouletteOpen] = useState(false);
@@ -101,9 +96,6 @@ export const App: React.FC = () => {
 
     return cleanup;
   }, [searchOpen, rouletteOpen, infoOpen, selectedItem, gridContext, activeTab]);
-
-  // Dynamic Ambient Color Priority: Open DetailModal -> Active Hero Slide
-  const activeAmbientColor = selectedItem?.accent_color || heroAccent || '#e11d48';
 
   const watchlistItems = useMemo(() => {
     return watchlistIds
@@ -290,29 +282,35 @@ export const App: React.FC = () => {
     [itemById]
   );
 
+  const handleOpenSearch = useCallback(() => {
+    triggerHaptic('light');
+    setSearchOpen(true);
+  }, []);
+
+  const handleOpenRoulette = useCallback(() => {
+    triggerHaptic('medium');
+    setRouletteOpen(true);
+  }, []);
+
+  const handleOpenInfo = useCallback(() => {
+    triggerHaptic('light');
+    setInfoOpen(true);
+  }, []);
+
   return (
     <div className="relative min-h-screen w-full text-slate-100 pb-safe-dock">
-      {/* Dynamic Ambient Aurora Backdrop */}
-      <AmbientBackground accentColor={activeAmbientColor} />
+      {/* Dynamic Ambient Aurora Backdrop (Zero CSS blur, event-driven without re-rendering App) */}
+      <AmbientBackground overrideColor={selectedItem?.accent_color} />
 
       {/* Main Foreground Content */}
       <div className="relative z-10 flex min-h-screen flex-col">
         <TopHeader
           watchlistCount={watchlistItems.length}
           onLogoClick={handleGoHomeTop}
-          onOpenSearch={() => {
-            triggerHaptic('light');
-            setSearchOpen(true);
-          }}
-          onOpenRoulette={() => {
-            triggerHaptic('medium');
-            setRouletteOpen(true);
-          }}
+          onOpenSearch={handleOpenSearch}
+          onOpenRoulette={handleOpenRoulette}
           onOpenWatchlist={handleOpenWatchlist}
-          onOpenInfo={() => {
-            triggerHaptic('light');
-            setInfoOpen(true);
-          }}
+          onOpenInfo={handleOpenInfo}
         />
 
         <main className="flex-1">
@@ -351,7 +349,6 @@ export const App: React.FC = () => {
               onTagCountry={handleTagCountry}
               onTagPlatform={handleTagPlatform}
               onTagStudio={handleTagStudio}
-              onHeroAccentChange={handleHeroAccentChange}
             />
           ) : activeTab === 'movies' || activeTab === 'series' || activeTab === 'donghua' ? (
             <CategoryTabView
@@ -367,7 +364,6 @@ export const App: React.FC = () => {
               onTagGenre={handleTagGenre}
               onTagPlatform={handleTagPlatform}
               onTagStudio={handleTagStudio}
-              onHeroAccentChange={handleHeroAccentChange}
             />
           ) : (
             <SuperExplorerView

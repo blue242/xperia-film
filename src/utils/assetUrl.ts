@@ -23,6 +23,15 @@ export function hexToRgbString(hex?: string | null, fallback = '225, 29, 72'): s
   return `${r}, ${g}, ${b}`;
 }
 
+export const AMBIENT_COLOR_EVENT = 'xperia:ambient-color';
+
+export function emitAmbientColor(hex?: string | null): void {
+  if (typeof window === 'undefined') return;
+  const rgb = hexToRgbString(hex, '225, 29, 72');
+  document.documentElement.style.setProperty('--ambient-rgb', rgb);
+  window.dispatchEvent(new CustomEvent<string>(AMBIENT_COLOR_EVENT, { detail: rgb }));
+}
+
 export function splitCountries(countryStr?: string | null): string[] {
   if (!countryStr) return [];
   return countryStr

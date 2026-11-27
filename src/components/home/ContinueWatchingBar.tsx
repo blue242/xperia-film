@@ -11,7 +11,7 @@ interface ContinueWatchingBarProps {
   onClearAll: () => void;
 }
 
-export const ContinueWatchingBar: React.FC<ContinueWatchingBarProps> = ({
+export const ContinueWatchingBar: React.FC<ContinueWatchingBarProps> = React.memo(({
   entries,
   onOpenItemById,
   onRemoveEntry,
@@ -23,7 +23,7 @@ export const ContinueWatchingBar: React.FC<ContinueWatchingBarProps> = ({
 
   return (
     <section className="mx-auto mt-4 w-full max-w-7xl px-3 sm:px-5">
-      <div className="overflow-hidden rounded-2xl border border-amber-400/35 bg-gradient-to-r from-amber-500/[0.11] via-[#13121f]/90 to-rose-500/[0.09] backdrop-blur-xl shadow-[0_12px_34px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(251,191,36,0.22)]">
+      <div className="overflow-hidden rounded-2xl border border-amber-400/35 bg-gradient-to-r from-[#1f170d]/95 via-[#12111f]/96 to-[#1e1017]/95 shadow-lg">
         {/* Header Bar */}
         <div className="flex items-center justify-between gap-2 px-3.5 py-2.5 sm:px-4">
           <button
@@ -130,4 +130,6 @@ export const ContinueWatchingBar: React.FC<ContinueWatchingBarProps> = ({
       </div>
     </section>
   );
-};
+});
+
+ContinueWatchingBar.displayName = 'ContinueWatchingBar';

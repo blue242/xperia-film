@@ -7,7 +7,7 @@ interface StatsRibbonProps {
   onSelectTab: (tab: NavTab) => void;
 }
 
-export const StatsRibbon: React.FC<StatsRibbonProps> = ({ stats, onSelectTab }) => {
+export const StatsRibbon: React.FC<StatsRibbonProps> = React.memo(({ stats, onSelectTab }) => {
   if (!stats) return null;
 
   const cards: Array<{
@@ -58,7 +58,7 @@ export const StatsRibbon: React.FC<StatsRibbonProps> = ({ stats, onSelectTab }) 
               triggerHaptic('selection');
               onSelectTab(c.tab);
             }}
-            className={`group flex flex-col justify-between rounded-xl sm:rounded-2xl bg-gradient-to-br ${c.accent} border p-2.5 sm:p-3.5 text-left backdrop-blur-xl hover:brightness-125 active:scale-[0.98] transition-all`}
+            className={`group flex flex-col justify-between rounded-xl sm:rounded-2xl bg-[#111120]/92 bg-gradient-to-br ${c.accent} border p-2.5 sm:p-3.5 text-left md:hover:brightness-125 active:scale-[0.98] transition-transform`}
           >
             <div className="flex items-center justify-between gap-1">
               <span className="text-[11px] sm:text-xs font-bold text-slate-200">{c.label}</span>
@@ -79,4 +79,6 @@ export const StatsRibbon: React.FC<StatsRibbonProps> = ({ stats, onSelectTab }) 
       </div>
     </section>
   );
-};
+});
+
+StatsRibbon.displayName = 'StatsRibbon';

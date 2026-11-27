@@ -37,12 +37,11 @@ interface CategoryTabViewProps {
   onTagGenre: (genre: string) => void;
   onTagPlatform: (platform: string) => void;
   onTagStudio: (studio: string) => void;
-  onHeroAccentChange: (accentColor?: string | null) => void;
 }
 
 const GRID_STEP = 36;
 
-export const CategoryTabView: React.FC<CategoryTabViewProps> = ({
+const CategoryTabViewInner: React.FC<CategoryTabViewProps> = ({
   category,
   movies,
   series,
@@ -55,7 +54,6 @@ export const CategoryTabView: React.FC<CategoryTabViewProps> = ({
   onTagGenre,
   onTagPlatform,
   onTagStudio,
-  onHeroAccentChange,
 }) => {
   const [activeLetter, setActiveLetter] = useState<string>('ALL');
   const [visibleGridCount, setVisibleGridCount] = useState<number>(GRID_STEP);
@@ -371,7 +369,6 @@ export const CategoryTabView: React.FC<CategoryTabViewProps> = ({
             initialFilter: { category, country: c },
           })
         }
-        onAccentChange={onHeroAccentChange}
       />
 
       {/* Quick Filter Strip + Full Grid CTA */}
@@ -550,3 +547,6 @@ export const CategoryTabView: React.FC<CategoryTabViewProps> = ({
     </div>
   );
 };
+
+export const CategoryTabView = React.memo(CategoryTabViewInner);
+CategoryTabView.displayName = 'CategoryTabView';

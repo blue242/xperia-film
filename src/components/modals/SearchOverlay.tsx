@@ -59,7 +59,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
       aria-modal="true"
       aria-label="Pencarian Instan"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-lg p-3 sm:p-6 pt-4 sm:pt-10"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/88 p-3 sm:p-6 pt-4 sm:pt-10"
     >
       <div
         onClick={(e) => e.stopPropagation()}

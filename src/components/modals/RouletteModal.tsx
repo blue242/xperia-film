@@ -67,7 +67,7 @@ export const RouletteModal: React.FC<RouletteModalProps> = ({
       aria-modal="true"
       aria-label="Cinema Roulette"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-lg p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/88 p-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}

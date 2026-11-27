@@ -18,7 +18,7 @@ interface PosterCardProps {
   className?: string;
 }
 
-export const PosterCard: React.FC<PosterCardProps> = ({
+const PosterCardInner: React.FC<PosterCardProps> = ({
   item,
   onSelect,
   onTagGenre,
@@ -55,14 +55,16 @@ export const PosterCard: React.FC<PosterCardProps> = ({
       }}
       className={`group luxury-card-frame relative flex flex-col overflow-hidden rounded-xl sm:rounded-2xl cursor-pointer select-none ${className}`}
     >
-      {/* 2:3 Poster Frame with 4-Corner Rich Badges */}
+      {/* 2:3 Poster Frame with 4-Corner Rich Badges (Zero backdrop-filter for 60fps mobile) */}
       <div className="relative aspect-[2/3] w-full overflow-hidden bg-[#10101c]">
-        {/* Shimmer skeleton before image loads */}
+        {/* Static luxury gradient placeholder while lazy image loads (no infinite animate-pulse) */}
         {!imgLoaded && !imgError && (
           <div
-            className="absolute inset-0 animate-pulse"
+            className="absolute inset-0"
             style={{
-              background: `linear-gradient(135deg, ${item.accent_color || '#1f1f35'}33 0%, #0d0d18 100%)`,
+              background: `linear-gradient(145deg, ${
+                item.accent_color || '#1f1f35'
+              }2e 0%, #0d0d18 100%)`,
             }}
           />
         )}
@@ -75,7 +77,7 @@ export const PosterCard: React.FC<PosterCardProps> = ({
             decoding="async"
             onLoad={() => setImgLoaded(true)}
             onError={() => setImgError(true)}
-            className={`h-full w-full object-cover transition-all duration-500 group-hover:scale-105 ${
+            className={`h-full w-full object-cover transition-opacity duration-200 md:transition-transform md:duration-300 md:group-hover:scale-105 ${
               imgLoaded ? 'opacity-100' : 'opacity-0'
             }`}
           />
@@ -96,7 +98,7 @@ export const PosterCard: React.FC<PosterCardProps> = ({
         )}
 
         {/* Top subtle vignette & Bottom rich dark gradient for crisp corner legibility */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/70 via-black/25 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/70 to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/95 via-black/55 to-transparent" />
 
         {/* ==================== CATEGORY 1: MOVIES ==================== */}
@@ -105,12 +107,12 @@ export const PosterCard: React.FC<PosterCardProps> = ({
             {/* Top-Left: Rating or BARU */}
             <div className="absolute left-1.5 top-1.5 z-10">
               {item.rating ? (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-black/70 backdrop-blur-md border border-amber-400/35 px-1.5 py-0.5 text-[10px] font-extrabold text-white shadow">
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-[#090913]/90 border border-amber-400/40 px-1.5 py-0.5 text-[10px] font-extrabold text-white">
                   <span className="text-amber-400">⭐</span>
                   <span>{item.rating.toFixed(1)}</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-500/90 to-yellow-600/90 border border-amber-200/40 px-1.5 py-0.5 text-[9.5px] font-extrabold text-black shadow">
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 border border-amber-200/45 px-1.5 py-0.5 text-[9.5px] font-extrabold text-black">
                   🎬 BARU
                 </span>
               )}
@@ -119,7 +121,7 @@ export const PosterCard: React.FC<PosterCardProps> = ({
             {/* Top-Right: Emerald Quality + Multi-part indicator */}
             <div className="absolute right-1.5 top-1.5 z-10 flex flex-col items-end gap-1">
               <span
-                className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-black tracking-wide text-white shadow-[0_2px_10px_rgba(16,185,129,0.5)] border border-emerald-300/35"
+                className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-black tracking-wide text-white border border-emerald-300/40"
                 style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 }}
@@ -127,7 +129,7 @@ export const PosterCard: React.FC<PosterCardProps> = ({
                 {item.quality || 'HD'}
               </span>
               {item.parts && item.parts.length > 1 && (
-                <span className="inline-flex items-center rounded bg-amber-500/95 px-1.5 py-0.5 text-[8.5px] font-black tracking-tight text-black shadow">
+                <span className="inline-flex items-center rounded bg-amber-500 px-1.5 py-0.5 text-[8.5px] font-black tracking-tight text-black">
                   {item.parts.length} PART
                 </span>
               )}
@@ -135,10 +137,10 @@ export const PosterCard: React.FC<PosterCardProps> = ({
 
             {/* Bottom-Left & Bottom-Right */}
             <div className="absolute inset-x-1.5 bottom-1.5 z-10 flex items-center justify-between gap-1">
-              <span className="text-[10.5px] font-extrabold tracking-tight text-slate-100 drop-shadow">
+              <span className="text-[10.5px] font-extrabold tracking-tight text-slate-100">
                 {item.year || '2026'}
               </span>
-              <span className="inline-flex items-center rounded bg-white/15 backdrop-blur-md border border-white/15 px-1.5 py-0.5 text-[9.5px] font-bold text-slate-100">
+              <span className="inline-flex items-center rounded bg-[#141426]/90 border border-white/20 px-1.5 py-0.5 text-[9.5px] font-bold text-slate-100">
                 {item.duration_label || shortCountry || 'SUB'}
               </span>
             </div>
@@ -151,12 +153,12 @@ export const PosterCard: React.FC<PosterCardProps> = ({
             {/* Top-Left: Rating or HOT */}
             <div className="absolute left-1.5 top-1.5 z-10">
               {item.rating ? (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-black/70 backdrop-blur-md border border-amber-400/35 px-1.5 py-0.5 text-[10px] font-extrabold text-white shadow">
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-[#090913]/90 border border-amber-400/40 px-1.5 py-0.5 text-[10px] font-extrabold text-white">
                   <span className="text-amber-400">⭐</span>
                   <span>{item.rating.toFixed(1)}</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-orange-500 to-rose-600 border border-orange-300/40 px-1.5 py-0.5 text-[9.5px] font-extrabold text-white shadow">
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-orange-500 to-rose-600 border border-orange-300/40 px-1.5 py-0.5 text-[9.5px] font-extrabold text-white">
                   🔥 HOT
                 </span>
               )}
@@ -164,7 +166,7 @@ export const PosterCard: React.FC<PosterCardProps> = ({
 
             {/* Top-Right: LK21 Signature Vertical Ribbon */}
             <div
-              className="lk21-ribbon absolute right-2 top-0 z-20 flex min-w-[30px] flex-col items-center justify-start px-1.5 pt-1 pb-2.5 text-white shadow-[0_4px_14px_rgba(0,0,0,0.65)]"
+              className="lk21-ribbon absolute right-2 top-0 z-20 flex min-w-[30px] flex-col items-center justify-start px-1.5 pt-1 pb-2.5 text-white shadow-md"
               style={{
                 background: completed
                   ? 'linear-gradient(180deg, #d97706 0%, #f59e0b 100%)'
@@ -174,22 +176,22 @@ export const PosterCard: React.FC<PosterCardProps> = ({
               <span className="text-[7.5px] font-extrabold uppercase tracking-wider leading-none opacity-95">
                 EPS
               </span>
-              <span className="mt-0.5 font-display text-[13px] font-black leading-none drop-shadow">
+              <span className="mt-0.5 font-display text-[13px] font-black leading-none">
                 {item.latest_episode || item.uploaded_episodes || 1}
               </span>
             </div>
 
             {/* Bottom-Left & Bottom-Right */}
             <div className="absolute inset-x-1.5 bottom-1.5 z-10 flex items-center justify-between gap-1">
-              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-slate-100 drop-shadow">
+              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-slate-100">
                 <span>{item.year || '2026'}</span>
                 {shortCountry && (
-                  <span className="rounded bg-white/15 px-1 py-0.2 text-[8.5px] text-amber-200">
+                  <span className="rounded bg-[#151526]/90 border border-white/15 px-1 py-0.2 text-[8.5px] text-amber-200">
                     {shortCountry}
                   </span>
                 )}
               </span>
-              <span className="rounded bg-fuchsia-500/30 backdrop-blur-md border border-fuchsia-300/35 px-1.5 py-0.5 font-display text-[10px] font-black tracking-wide text-fuchsia-100">
+              <span className="rounded bg-fuchsia-950/90 border border-fuchsia-400/45 px-1.5 py-0.5 font-display text-[10px] font-black tracking-wide text-fuchsia-100">
                 {item.season_label || 'S.1'}
               </span>
             </div>
@@ -205,7 +207,7 @@ export const PosterCard: React.FC<PosterCardProps> = ({
                 <div className="anichin-diagonal-ribbon">COMPLETED</div>
                 {item.rating && (
                   <div className="absolute left-1.5 top-8 z-10">
-                    <span className="inline-flex items-center gap-0.5 rounded-full bg-black/75 backdrop-blur-md border border-amber-400/35 px-1.5 py-0.5 text-[9.5px] font-extrabold text-white shadow">
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-[#090913]/92 border border-amber-400/40 px-1.5 py-0.5 text-[9.5px] font-extrabold text-white">
                       <span className="text-amber-400">⭐</span>
                       <span>{item.rating.toFixed(1)}</span>
                     </span>
@@ -214,11 +216,11 @@ export const PosterCard: React.FC<PosterCardProps> = ({
               </>
             ) : (
               <div className="absolute left-1.5 top-1.5 z-10 flex items-center gap-1">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 text-[11px] shadow-[0_0_12px_rgba(249,115,22,0.8)] border border-amber-200/40">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 text-[11px] border border-amber-200/45">
                   🔥
                 </span>
                 {item.rating && (
-                  <span className="inline-flex items-center gap-0.5 rounded-full bg-black/70 backdrop-blur-md border border-amber-400/30 px-1.5 py-0.5 text-[9.5px] font-extrabold text-white">
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-[#090913]/90 border border-amber-400/35 px-1.5 py-0.5 text-[9.5px] font-extrabold text-white">
                     <span className="text-amber-400">⭐</span>
                     <span>{item.rating.toFixed(1)}</span>
                   </span>
@@ -229,7 +231,7 @@ export const PosterCard: React.FC<PosterCardProps> = ({
             {/* Top-Right: Coral Red Donghua Capsule */}
             <div className="absolute right-1.5 top-1.5 z-10">
               <span
-                className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-white shadow-[0_2px_10px_rgba(244,63,94,0.45)] border border-rose-200/30"
+                className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-white border border-rose-200/35"
                 style={{
                   background: 'linear-gradient(135deg, #ef4444 0%, #f43f5e 100%)',
                 }}
@@ -240,11 +242,11 @@ export const PosterCard: React.FC<PosterCardProps> = ({
 
             {/* Bottom-Left: Orange-Red Ep Badge & Bottom-Right: Gold Sub Capsule */}
             <div className="absolute inset-x-1.5 bottom-1.5 z-10 flex items-center justify-between gap-1">
-              <span className="inline-flex items-center rounded-md bg-gradient-to-r from-orange-600 to-rose-600 border border-orange-300/35 px-1.5 py-0.5 text-[9.5px] font-black tracking-tight text-white shadow">
+              <span className="inline-flex items-center rounded-md bg-gradient-to-r from-orange-600 to-rose-600 border border-orange-300/35 px-1.5 py-0.5 text-[9.5px] font-black tracking-tight text-white">
                 Ep {item.latest_episode || item.total_uploaded_episodes || 1}
                 {completed ? ' END' : ''}
               </span>
-              <span className="inline-flex items-center rounded-md bg-[#f59e0b] px-1.5 py-0.5 text-[9.5px] font-black uppercase tracking-tight text-black shadow">
+              <span className="inline-flex items-center rounded-md bg-[#f59e0b] px-1.5 py-0.5 text-[9.5px] font-black uppercase tracking-tight text-black">
                 Sub
               </span>
             </div>
@@ -324,10 +326,13 @@ export const PosterCard: React.FC<PosterCardProps> = ({
         </div>
 
         {/* Title (Max 2 Lines) */}
-        <h3 className="font-display text-[12px] sm:text-[13.5px] font-bold leading-[1.28] text-slate-100 group-hover:text-amber-300 transition-colors line-clamp-2 min-h-[2.5em]">
+        <h3 className="font-display text-[12px] sm:text-[13.5px] font-bold leading-[1.28] text-slate-100 md:group-hover:text-amber-300 transition-colors line-clamp-2 min-h-[2.5em]">
           {item.title}
         </h3>
       </div>
     </article>
   );
 };
+
+export const PosterCard = React.memo(PosterCardInner);
+PosterCard.displayName = 'PosterCard';

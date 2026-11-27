@@ -18,13 +18,13 @@ interface ContentRailProps {
   onTagStudio: (studio: string) => void;
 }
 
-export const ContentRail: React.FC<ContentRailProps> = ({
+const ContentRailInner: React.FC<ContentRailProps> = ({
   title,
   subtitle,
   accentGradient = 'from-rose-500 via-red-500 to-amber-400',
   items,
   gridContext,
-  maxPreview = 16,
+  maxPreview = 12,
   onOpenGrid,
   onSelectItem,
   onTagGenre,
@@ -52,7 +52,7 @@ export const ContentRail: React.FC<ContentRailProps> = ({
       <div className="mb-2.5 sm:mb-3 flex items-center justify-between gap-2 px-3 sm:px-5">
         <div className="flex items-center gap-2.5 min-w-0">
           <span
-            className={`h-6 w-1.5 shrink-0 rounded-full bg-gradient-to-b ${accentGradient} shadow-[0_0_12px_rgba(244,63,94,0.65)]`}
+            className={`h-6 w-1.5 shrink-0 rounded-full bg-gradient-to-b ${accentGradient}`}
           />
           <div className="min-w-0">
             <h2 className="truncate font-display text-[15px] sm:text-lg font-extrabold tracking-tight text-white">
@@ -92,7 +92,7 @@ export const ContentRail: React.FC<ContentRailProps> = ({
               triggerHaptic('selection');
               onOpenGrid(gridContext);
             }}
-            className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-amber-500 border border-rose-300/35 px-2.5 sm:px-3 py-1 text-[10.5px] sm:text-xs font-black uppercase tracking-wider text-white shadow-[0_4px_14px_rgba(225,29,72,0.45)] active:scale-95 transition-all"
+            className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-amber-500 border border-rose-300/35 px-2.5 sm:px-3 py-1 text-[10.5px] sm:text-xs font-black uppercase tracking-wider text-white shadow-sm active:scale-95 transition-transform"
           >
             <span>SEMUA</span>
             <span className="rounded bg-black/25 px-1 text-[9.5px] font-bold">
@@ -102,10 +102,10 @@ export const ContentRail: React.FC<ContentRailProps> = ({
         </div>
       </div>
 
-      {/* Horizontal Card Track */}
+      {/* Horizontal Card Track (touch-pan-x + overscroll-x-contain for smooth 60fps mobile) */}
       <div
         ref={scrollRef}
-        className="no-scrollbar flex gap-2.5 sm:gap-3.5 overflow-x-auto px-3 sm:px-5 pb-1"
+        className="no-scrollbar flex gap-2.5 sm:gap-3.5 overflow-x-auto overscroll-x-contain touch-pan-x px-3 sm:px-5 pb-1"
       >
         {visibleItems.map((item) => (
           <div
@@ -125,3 +125,6 @@ export const ContentRail: React.FC<ContentRailProps> = ({
     </section>
   );
 };
+
+export const ContentRail = React.memo(ContentRailInner);
+ContentRail.displayName = 'ContentRail';

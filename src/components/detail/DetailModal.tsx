@@ -141,14 +141,13 @@ export const DetailModal: React.FC<DetailModalProps> = ({
       aria-modal="true"
       aria-label={item.title}
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-0 sm:p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/88 p-0 sm:p-4"
     >
       {/* Dynamic Ambient Modal Glow Behind Card */}
       <div
         className="pointer-events-none fixed inset-0 z-0 opacity-65"
         style={{
           background: `radial-gradient(circle at 50% 18%, rgba(${accentRgb}, 0.42), rgba(6,6,11,0) 65%)`,
-          transition: 'background 700ms ease',
         }}
       />
 
@@ -156,10 +155,10 @@ export const DetailModal: React.FC<DetailModalProps> = ({
       <div
         ref={scrollContainerRef}
         onClick={(e) => e.stopPropagation()}
-        className="slim-scrollbar relative z-10 h-[93vh] sm:h-auto sm:max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-white/15 bg-[#090913]/95 shadow-[0_25px_70px_rgba(0,0,0,0.95)]"
+        className="slim-scrollbar relative z-10 h-[93vh] sm:h-auto sm:max-h-[90vh] w-full max-w-4xl overflow-y-auto overscroll-y-contain rounded-t-3xl sm:rounded-3xl border border-white/15 bg-[#090913] shadow-2xl"
       >
-        {/* Top Floating Controls */}
-        <div className="sticky top-0 z-30 flex items-center justify-between gap-2 bg-gradient-to-b from-black/85 via-black/45 to-transparent px-4 py-3 backdrop-blur-sm">
+        {/* Top Floating Controls (Solid smooth dark gradient, zero backdrop-blur for 60fps episode scrolling) */}
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-2 bg-gradient-to-b from-[#090913] via-[#090913]/90 to-transparent px-4 py-3">
           <button
             type="button"
             onClick={() => {
@@ -175,10 +174,10 @@ export const DetailModal: React.FC<DetailModalProps> = ({
             <button
               type="button"
               onClick={() => onToggleSave(item.id)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold border backdrop-blur-xl transition-all active:scale-95 ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold border transition-transform active:scale-95 ${
                 saved
-                  ? 'bg-amber-500/25 border-amber-400/60 text-amber-200'
-                  : 'bg-black/60 hover:bg-white/15 border-white/20 text-white'
+                  ? 'bg-amber-950/95 border-amber-400/60 text-amber-200'
+                  : 'bg-[#121222]/95 hover:bg-white/15 border-white/20 text-white'
               }`}
             >
               {saved ? (
@@ -197,7 +196,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
             <button
               type="button"
               onClick={handleShare}
-              className="inline-flex items-center gap-1.5 rounded-full bg-black/60 hover:bg-white/15 border border-white/20 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-xl active:scale-95 transition-all"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#121222]/95 hover:bg-white/15 border border-white/20 px-3 py-1.5 text-xs font-bold text-white active:scale-95 transition-transform"
             >
               <Share2 className="h-3.5 w-3.5 text-sky-300" />
               <span>{copiedNotice ? 'Disalin!' : 'Bagikan'}</span>
@@ -210,7 +209,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                 onClose();
               }}
               aria-label="Tutup Detail"
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/70 hover:bg-rose-600 border border-white/25 text-white transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#121222]/95 hover:bg-rose-600 border border-white/25 text-white transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -218,17 +217,18 @@ export const DetailModal: React.FC<DetailModalProps> = ({
         </div>
 
         {/* Hero Banner Header Inside Modal */}
-        <div className="relative -mt-14 h-56 sm:h-72 w-full overflow-hidden">
+        <div className="relative -mt-14 h-56 sm:h-72 w-full overflow-hidden bg-[#0a0a14]">
           <img
             src={backdropUrl}
             alt={item.title}
+            decoding="async"
             className={`h-full w-full object-cover ${
-              item.backdrop_local ? 'object-center' : 'scale-125 blur-xl opacity-60'
+              item.backdrop_local ? 'object-center' : 'object-center scale-105 opacity-40'
             }`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#090913] via-[#090913]/65 to-black/25" />
           <div
-            className="absolute inset-0 opacity-45 mix-blend-screen"
+            className="pointer-events-none absolute inset-0 opacity-35"
             style={{
               background: `radial-gradient(circle at 75% 25%, rgba(${accentRgb}, 0.5), transparent 65%)`,
             }}

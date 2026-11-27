@@ -39,10 +39,9 @@ interface HomeTabViewProps {
   onTagCountry: (country: string) => void;
   onTagPlatform: (platform: string) => void;
   onTagStudio: (studio: string) => void;
-  onHeroAccentChange: (accentColor?: string | null) => void;
 }
 
-export const HomeTabView: React.FC<HomeTabViewProps> = ({
+const HomeTabViewInner: React.FC<HomeTabViewProps> = ({
   stats,
   movies,
   series,
@@ -64,7 +63,6 @@ export const HomeTabView: React.FC<HomeTabViewProps> = ({
   onTagCountry,
   onTagPlatform,
   onTagStudio,
-  onHeroAccentChange,
 }) => {
   // Resolve featured_hero into full CatalogItem objects while preserving sharp backdrop_local
   const heroItems = useMemo<CatalogItem[]>(() => {
@@ -244,7 +242,6 @@ export const HomeTabView: React.FC<HomeTabViewProps> = ({
         onSelectGenre={onTagGenre}
         onSelectYear={onTagYear}
         onSelectCountry={onTagCountry}
-        onAccentChange={onHeroAccentChange}
       />
 
       <ContinueWatchingBar
@@ -274,3 +271,6 @@ export const HomeTabView: React.FC<HomeTabViewProps> = ({
     </div>
   );
 };
+
+export const HomeTabView = React.memo(HomeTabViewInner);
+HomeTabView.displayName = 'HomeTabView';
